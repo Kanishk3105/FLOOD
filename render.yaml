@@ -1,0 +1,12 @@
+# Render Blueprint: https://render.com/docs/infrastructure-as-code
+# After push: Dashboard → New → Blueprint → connect repo, or use Render CLI.
+
+services:
+  - type: web
+    name: flodo-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health

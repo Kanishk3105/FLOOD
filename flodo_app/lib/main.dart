@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'providers/task_provider.dart';
 import 'screens/task_list_screen.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,10 +17,10 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => TaskProvider())],
       child: MaterialApp(
-        title: 'Flodo Task Manager',
+        title: 'Flodo Tasks',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(primarySwatch: Colors.blue),
-        home: TaskListScreen(),
+        theme: AppTheme.light(),
+        home: const TaskListScreen(),
       ),
     );
   }

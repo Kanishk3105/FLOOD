@@ -1,6 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional
+
 
 class TaskBase(BaseModel):
     title: str
@@ -9,14 +10,16 @@ class TaskBase(BaseModel):
     status: str
     blocked_by_task_id: Optional[int] = None
 
+
 class TaskCreate(TaskBase):
     pass
+
 
 class TaskUpdate(TaskBase):
     pass
 
+
 class Task(TaskBase):
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

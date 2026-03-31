@@ -1,9 +1,12 @@
-from fastapi import FastAPI, Depends, HTTPException
+from contextlib import asynccontextmanager
+from typing import Optional
+
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from . import crud, models, schemas
 from .database import engine, get_db
-from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -23,8 +26,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 @app.get("/tasks", response_model=list[schemas.Task])
-async def read_tasks(skip: int = 0, limit: int = 100, search: str = None, status: str = None, db: AsyncSession = Depends(get_db)):
+async def read_tasks(
+    skip: int = 0,
+    limit: int = 100,
+    search: Optional[str] = None,
+    status: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
+):
     tasks = await crud.get_tasks(db, skip=skip, limit=limit, search=search, status=status)
     return tasks
 
@@ -40,14 +53,14 @@ async def read_task(task_id: int, db: AsyncSession = Depends(get_db)):
     return db_task
 
 @app.put("/tasks/{task_id}", response_model=schemas.Task)
-async def update_task(task_id: int, task: schemas.TaskUpdate, db: AsyncSession = Depends(get_db)):
+async def update_task_endpoint(task_id: int, task: schemas.TaskUpdate, db: AsyncSession = Depends(get_db)):
     db_task = await crud.update_task(db, task_id, task)
     if db_task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     return db_task
 
 @app.delete("/tasks/{task_id}")
-async def delete_task(task_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_task_endpoint(task_id: int, db: AsyncSession = Depends(get_db)):
     success = await crud.delete_task(db, task_id)
     if not success:
         raise HTTPException(status_code=404, detail="Task not found")

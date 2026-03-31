@@ -2,6 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
+/// Set to `true` to use the deployed API (phones, any network). Set to `false` for local dev.
+const bool kUseRemoteApi = true;
+
+/// Deployed backend (no trailing slash — paths are appended as `/tasks`, etc.).
+const String kRemoteApiBaseUrl = 'https://flodo-api.onrender.com';
+
 /// Your machine’s LAN address (macOS: `ipconfig getifaddr en0`).
 /// Update if your Wi‑Fi IP changes.
 const String kTaskApiLanHost = '192.168.1.11';
@@ -14,6 +20,9 @@ const int kTaskApiPort = 8001;
 const bool kAndroidUseEmulatorLoopback = false;
 
 String taskApiBaseUrl() {
+  if (kUseRemoteApi) {
+    return kRemoteApiBaseUrl;
+  }
   if (kIsWeb) {
     return 'http://$kTaskApiLanHost:$kTaskApiPort';
   }
@@ -21,6 +30,5 @@ String taskApiBaseUrl() {
     final host = kAndroidUseEmulatorLoopback ? '10.0.2.2' : kTaskApiLanHost;
     return 'http://$host:$kTaskApiPort';
   }
-  // iOS simulator / desktop: LAN IP works for a device build; use 127.0.0.1 locally if needed.
   return 'http://$kTaskApiLanHost:$kTaskApiPort';
 }
